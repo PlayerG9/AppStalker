@@ -33,6 +33,19 @@ def AddToRegistry():
     reg.CloseKey(open)
 """
 import winreg
+import ctypes
+
+
+def isAdmin():
+    import os
+    try:
+        return os.getuid() == 0
+    except AttributeError:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+
+
+KEY_ALL = winreg.HKEY_USERS  # or winreg.HKEY_CLASSES_ROOT?
+KEY_USER = winreg.HKEY_CURRENT_USER
 
 
 def is_added():
