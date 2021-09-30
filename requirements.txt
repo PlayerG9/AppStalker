@@ -1,8 +1,10 @@
 # both
-tendo  # singleton
+tendo  # singleton <- SingleInstance
+Pillow
 
 # stalker
 schedule
+pystray
 
 # viewer
 
