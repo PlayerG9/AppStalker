@@ -35,19 +35,84 @@ from tendo.singleton import SingleInstance
 me = SingleInstance()
 
 import schedule
+from pystray import Icon, Menu, MenuItem
+from pystray._win32 import Icon as IconHint
+from PIL import Image
+
+import threading
+import os
+import time
 
 
 class Application:
     def __init__(self):
-        pass
+        self.job = schedule.every().minute.at(':00').do(self.task)
+        self.icon: IconHint = Icon(
+            name="Name",
+            icon=self.get_icon(),
+            title="Title",
+            menu=Menu(
+                MenuItem(
+                    text="Quit",
+                    action=self.quit
+                )
+            )
+        )
+        self.schedule_thread = threading.Thread(target=self.schedule_handler, name="SysTrayIcon", daemon=True)
+        self.running = None
 
     def run(self):
-        pass
+        self.running = True
+        self.schedule_thread.start()
+        self.icon.run()  # I would prefer if icon.run() is in a thread but then the systray-icon won't show
+        self.icon.visible = False
+
+    def schedule_handler(self):
+        while self.running:
+            try:
+                schedule.run_pending()
+            except Exception as exception:
+                self.warn_error(exception)
+                raise exception
+            time.sleep(0.5)
+
+    def quit(self):
+        self.running = False
+        self.icon.stop()
+
+    def task(self):
+        self.icon.notify(title="Measuring", message=__file__)
+
+    ####################################################################################################################
+
+    @staticmethod
+    def get_icon() -> Image.Image:
+        iconpath = os.path.join(os.path.dirname(__file__), 'memory', 'icon.png')
+        try:
+            image = Image.open(iconpath)
+        except FileNotFoundError:
+            image = Image.new('RGBA', [30, 30], 'cyan')
+        return image
+
+    def warn_error(self, exception: Exception):
+        if not self.icon.HAS_NOTIFICATION: return
+        self.icon.notify(
+            title="Measurement failed",
+            message="Measurement failed due to an unexpected {}."
+                    "({}: {})".format(
+                exception.__class__.__name__,
+                exception.__class__.__qualname__,
+                ''.join(exception.args)
+            )
+        )
 
 
 def main():
     app = Application()
-    app.run()
+    try:
+        app.run()
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == '__main__':
