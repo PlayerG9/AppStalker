@@ -41,7 +41,11 @@ def isAdmin():
     try:
         return os.getuid() == 0
     except AttributeError:
-        return ctypes.windll.shell32.IsUserAnAdmin()
+        pass
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin() == 1
+    except AttributeError:
+        raise SystemError("couln't check if user has admin provileges")
 
 
 KEY_ALL = winreg.HKEY_USERS  # or winreg.HKEY_CLASSES_ROOT?
