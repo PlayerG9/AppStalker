@@ -1,10 +1,8 @@
 # both
 tendo  # singleton
 
-
 # stalker
-
+schedule
 
 # viewer
-
 
