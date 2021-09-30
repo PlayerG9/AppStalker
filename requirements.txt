@@ -1,10 +1,11 @@
 # both
 tendo  # singleton <- SingleInstance
-Pillow
+Pillow  # create analyse-image and systray-icon
+psutil  # get process data and kill-(stalker)process
 
 # stalker
-schedule
-pystray
+schedule  # manage measurement-timing
+pystray  # systray-icon and notifications
 
 # viewer
 
