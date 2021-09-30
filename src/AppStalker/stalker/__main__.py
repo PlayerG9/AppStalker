@@ -49,11 +49,12 @@ import scripts
 
 class Application:
     def __init__(self):
+        logging.info("Creating app")
         self.job = schedule.every().minute.at(':00').do(self.task)
         self.icon: IconHint = Icon(
-            name="Name",
+            name="where is this displayed?",
             icon=self.get_icon(),
-            title="Title",
+            title="AppStalker",
             menu=Menu(
                 MenuItem(
                     text="Quit",
@@ -65,6 +66,7 @@ class Application:
         self.running = None
 
     def run(self):
+        logging.info("start running")
         self.running = True
         self.schedule_thread.start()
         self.icon.run()  # I would prefer if icon.run() is in a thread but then the systray-icon won't show
@@ -80,6 +82,7 @@ class Application:
             time.sleep(0.5)
 
     def quit(self):
+        logging.info("Stop app")
         self.running = False
         self.icon.stop()
 
@@ -93,7 +96,9 @@ class Application:
         iconpath = os.path.join(os.path.dirname(__file__), 'memory', 'icon.png')
         try:
             image = Image.open(iconpath)
+            logging.debug("Opened icon")
         except FileNotFoundError:
+            logging.warning("Failed to load icon")
             image = Image.new('RGBA', [30, 30], 'cyan')
         return image
 
@@ -113,17 +118,20 @@ class Application:
 def configure_logging():
     filename = os.path.join(scripts.get_appdir(), 'logs', 'stalker.txt')
     logging.basicConfig(
-        format="{time} | {level} | {filename} | {fileno} | {func} | {msg}",
+        format="{asctime} | {levelname:<10} | {filename:<15} | {lineno:<3} | {funcName:<15} | {message}",
         style="{",
         handlers=[
             logging.StreamHandler(),
             logging.FileHandler(
                 filename=filename,
                 mode='w',
-                encoding='utf-8'
+                encoding='utf-8',
+                errors='namereplace'  # https://docs.python.org/3/library/functions.html#open => \N{...}
             )
-        ]
+        ],
+        level=logging.DEBUG
     )
+    logging.getLogger('PIL').setLevel(logging.WARNING)
 
 
 def main():
