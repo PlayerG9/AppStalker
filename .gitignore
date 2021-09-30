@@ -2,6 +2,7 @@
 .idea/
 temp/
 build/build/
+src/AppStalker/logs/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

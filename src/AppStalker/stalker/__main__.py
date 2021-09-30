@@ -42,6 +42,9 @@ from PIL import Image
 import threading
 import os
 import time
+import logging
+
+import scripts
 
 
 class Application:
@@ -107,7 +110,24 @@ class Application:
         )
 
 
+def configure_logging():
+    filename = os.path.join(scripts.get_appdir(), 'logs', 'stalker.txt')
+    logging.basicConfig(
+        format="{time} | {level} | {filename} | {fileno} | {func} | {msg}",
+        style="{",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler(
+                filename=filename,
+                mode='w',
+                encoding='utf-8'
+            )
+        ]
+    )
+
+
 def main():
+    configure_logging()
     app = Application()
     try:
         app.run()
