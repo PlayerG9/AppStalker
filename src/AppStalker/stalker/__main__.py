@@ -15,6 +15,7 @@ import os
 import time
 import logging
 import sqlite3 as sql
+import json
 
 import scripts
 import processview
@@ -23,7 +24,19 @@ import processview
 class Application:
     def __init__(self):
         logging.info("Creating app")
-        self.job = schedule.every().minute.at(':00').do(self.task)
+        self.config = self.get_config()
+
+        tm = self.config['time-mode']
+        interval = self.config['time-interval']
+        if not isinstance(interval, int) or not (0 < interval <= 60):
+            raise ValueError('invalid time-interval {!r}'.format(interval))
+        if tm == 'minutes':
+            self.job = schedule.every(interval).minutes.at(':00').do(self.job)
+        elif tm == 'seconds':
+            self.job = schedule.every(interval).seconds.do(self.job)
+        else:
+            raise ValueError('invalid time-mode {!r}'.format(tm))
+
         self.icon: IconHint = Icon(
             name="where is this displayed?",
             icon=self.get_icon(),
@@ -35,7 +48,8 @@ class Application:
                 )
             )
         )
-        self.schedule_thread = threading.Thread(target=self.schedule_handler, name="SysTrayIcon", daemon=True)
+
+        self.schedule_thread = threading.Thread(target=self.schedule_handler, daemon=True)
         self.running = None
 
     def run(self):
@@ -60,13 +74,13 @@ class Application:
         self.icon.stop()
 
     def task(self):
-        pass
+        process = processview.get_process()
 
     ####################################################################################################################
 
     @staticmethod
     def get_icon() -> Image.Image:
-        iconpath = os.path.join(os.path.dirname(__file__), 'memory', 'icon.png')
+        iconpath = os.path.join(scripts.get_memdir(), 'icon.png')
         try:
             image = Image.open(iconpath)
             logging.debug("Opened icon")
@@ -74,6 +88,16 @@ class Application:
             logging.warning("Failed to load icon")
             image = Image.new('RGBA', [30, 30], 'cyan')
         return image
+
+    @staticmethod
+    def get_config() -> dict:
+        configpath = os.path.join(scripts.get_memdir(), 'config.json')
+        configfile = open(configpath)
+        try:
+            config = json.load(configfile)
+        finally:
+            configfile.close()
+        return config
 
     def warn_error(self, exception: Exception):
         if not self.icon.HAS_NOTIFICATION: return
