@@ -3,6 +3,7 @@
 temp/
 build/build/
 src/AppStalker/logs/*
+src/AppStalker/memory/data.sl3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
