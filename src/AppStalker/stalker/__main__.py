@@ -3,6 +3,7 @@ r"""
 
 """
 from tendo.singleton import SingleInstance
+
 me = SingleInstance()
 
 import schedule
@@ -136,16 +137,16 @@ class DataBase:
 
         if not exe_id:
             cursor.execute("INSERT INTO executables "
-                              "(name, exe, cmdline, create_time, username) "
-                              "VALUES (?, ?, ?, ?, ?)",
-                              [
-                                  process.name(),
-                                  process.exe(),
-                                  process.cmdline(),
-                                  process.create_time(),
-                                  process.username()
-                              ]
-                              )
+                           "(name, exe, cmdline, create_time, username) "
+                           "VALUES (?, ?, ?, ?, ?)",
+                           [
+                               process.name(),
+                               process.exe(),
+                               process.cmdline(),
+                               process.create_time(),
+                               process.username()
+                           ]
+                           )
             exe_id = cursor.lastrowid
         if not exe_id:
             raise IndexError('how the fuck did this happen?')
