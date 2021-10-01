@@ -31,9 +31,9 @@ class Application:
         if not isinstance(interval, int) or not (0 < interval <= 60):
             raise ValueError('invalid time-interval {!r}'.format(interval))
         if tm == 'minutes':
-            self.job = schedule.every(interval).minutes.at(':00').do(self.job)
+            self.job = schedule.every(interval).minutes.at(':00').do(self.task)
         elif tm == 'seconds':
-            self.job = schedule.every(interval).seconds.do(self.job)
+            self.job = schedule.every(interval).seconds.do(self.task)
         else:
             raise ValueError('invalid time-mode {!r}'.format(tm))
 
@@ -75,6 +75,7 @@ class Application:
 
     def task(self):
         process = processview.get_process()
+        self.icon.notify(process.exe())
 
     ####################################################################################################################
 
