@@ -116,6 +116,8 @@ class Application:
 
 
 class DataBase:
+    database_structure = open(os.path.join(scripts.get_memdir(), 'db.sql'), 'r', encoding='utf-8').read()
+
     def __init__(self, config: dict):
         self.conn = sql.connect(os.path.join(scripts.get_memdir(), 'data.sl3'))
         self.config = config
@@ -147,10 +149,15 @@ class DataBase:
             exe_id = cursor.lastrowid
         if not exe_id:
             raise IndexError('how the fuck did this happen?')
-        self.conn.execute("INSERT INTO measurements (exe_id) VALUES (?)", [exe_id])
+        cursor.execute("INSERT INTO measurements (exe_id) VALUES (?)", [exe_id])
+        self.conn.commit()
 
     def delete_oldest(self):
         pass
+
+    def ensure_structure(self):
+        self.conn.execute(self.database_structure)
+        self.conn.commit()
 
 
 def configure_logging():
