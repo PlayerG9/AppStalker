@@ -9,6 +9,7 @@ import schedule
 from pystray import Icon, Menu, MenuItem
 from pystray._win32 import Icon as IconHint
 from PIL import Image
+import psutil
 
 import threading
 import os
@@ -75,7 +76,8 @@ class Application:
 
     def task(self):
         process = processview.get_process()
-        self.icon.notify(process.exe())
+        database = DataBase(self.config)
+        database.add(process)
 
     ####################################################################################################################
 
@@ -111,6 +113,44 @@ class Application:
                 ''.join(exception.args)
             )
         )
+
+
+class DataBase:
+    def __init__(self, config: dict):
+        self.conn = sql.connect(os.path.join(scripts.get_memdir(), 'data.sl3'))
+        self.config = config
+        self.delete_oldest()
+
+    def __del__(self):
+        self.conn.close()
+
+    def add(self, process: psutil.Process):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT rowid FROM exectuables WHERE create_time = ? LIMIT 1",
+            [process.create_time()]
+        )
+        exe_id = cursor.fetchone()
+
+        if not exe_id:
+            cursor.execute("INSERT INTO executables "
+                              "(name, exe, cmdline, create_time, username) "
+                              "VALUES (?, ?, ?, ?, ?)",
+                              [
+                                  process.name(),
+                                  process.exe(),
+                                  process.cmdline(),
+                                  process.create_time(),
+                                  process.username()
+                              ]
+                              )
+            exe_id = cursor.lastrowid
+        if not exe_id:
+            raise IndexError('how the fuck did this happen?')
+        self.conn.execute("INSERT INTO measurements (exe_id) VALUES (?)", [exe_id])
+
+    def delete_oldest(self):
+        pass
 
 
 def configure_logging():
