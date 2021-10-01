@@ -56,7 +56,7 @@ class Application:
         logging.info("start running")
         self.running = True
         self.schedule_thread.start()
-        self.icon.run()  # I would prefer if icon.run() is in a thread but then the systray-icon won't show
+        self.icon.run()  # I would prefer if icon.run() is in a thread but then the systray-icon-menu won't show
         self.icon.visible = False
 
     def schedule_handler(self):
