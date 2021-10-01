@@ -36,7 +36,7 @@ import winreg
 import ctypes
 
 
-def is_admin():
+def isAdmin():
     import os
     try:
         return os.getuid() == 0
@@ -50,48 +50,15 @@ def is_admin():
 
 KEY_ALL = winreg.HKEY_USERS  # or winreg.HKEY_CLASSES_ROOT?
 KEY_USER = winreg.HKEY_CURRENT_USER
-KEY_PATH = 'Software\Microsoft\Windows\CurrentVersion\Run'
-VALUE_NAME = 'AppStalker'
 
 
-def is_added(hkey=None, valcheck: str = None):
-    hkey = _get_hkey(hkey)
-
-    try:
-        key = winreg.OpenKey(hkey, KEY_PATH, 0, winreg.KEY_READ)
-
-        if valcheck:
-            if valcheck != winreg.QueryValueEx(key, VALUE_NAME)[0]:
-                raise ValueError('invalid entry')
-
-        winreg.CloseKey(key)
-
-        return True
-    except OSError:
-        return False
+def is_added():
+    pass
 
 
-def add(path: str, hkey=None):
-    hkey = _get_hkey(hkey)
-
-    key = winreg.OpenKey(hkey, KEY_PATH, 0, winreg.KEY_WRITE)
-
-    winreg.SetValueEx(key, VALUE_NAME, 0, winreg.REG_SZ, path)  # maybe winreg.REG_BINARY
-
-    winreg.CloseKey(key)
+def add():
+    pass
 
 
-def remove(hkey=None):
-    hkey = _get_hkey(hkey)
-
-    winreg.DeleteKey(hkey, KEY_PATH)
-
-
-def _get_hkey(hkey):
-    if hkey is None:
-        if is_admin():
-            return KEY_ALL
-        else:
-            return KEY_USER
-    else:
-        return hkey
+def remove():
+    pass
