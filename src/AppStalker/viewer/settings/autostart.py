@@ -50,7 +50,7 @@ def is_admin():
 
 KEY_ALL = winreg.HKEY_USERS  # or winreg.HKEY_CLASSES_ROOT?
 KEY_USER = winreg.HKEY_CURRENT_USER
-KEY_PATH = 'Software\Microsoft\Windows\CurrentVersion\Run'
+KEY_PATH = r'Software\Microsoft\Windows\CurrentVersion\Run'
 VALUE_NAME = 'AppStalker'
 
 
