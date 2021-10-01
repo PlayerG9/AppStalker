@@ -18,6 +18,7 @@ import time
 import logging
 import sqlite3 as sql
 import json
+import shlex
 
 import scripts
 import processview
@@ -130,19 +131,21 @@ class DataBase:
     def add(self, process: psutil.Process):
         cursor = self.conn.cursor()
         cursor.execute(
-            "SELECT rowid FROM exectuables WHERE create_time = ? LIMIT 1",
+            "SELECT rowid FROM executables WHERE create_time = ? LIMIT 1",
             [process.create_time()]
         )
         exe_id = cursor.fetchone()
 
-        if not exe_id:
+        if exe_id:  # exe_id = (exe_id,)
+            exe_id = exe_id[0]
+        else:
             cursor.execute("INSERT INTO executables "
                            "(name, exe, cmdline, create_time, username) "
                            "VALUES (?, ?, ?, ?, ?)",
                            [
                                process.name(),
                                process.exe(),
-                               process.cmdline(),
+                               shlex.join(process.cmdline()),
                                process.create_time(),
                                process.username()
                            ]
