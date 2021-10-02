@@ -7,10 +7,13 @@ from tkinter.constants import *
 from tkinter import messagebox
 
 import os
+import json
+from datetime import datetime
 
 import psutil
 
 import scripts
+from . import autostart
 
 
 class Settings(tk.LabelFrame):
@@ -42,11 +45,16 @@ class StalkerProcess(tk.LabelFrame):
 
         tk.Label(self, text="Stalker process running: ").grid(row=row, column=0, sticky=W)
         self.lbl_is_running = tk.Frame(self, background='red', cursor='hand2')
-        self.lbl_is_running.grid(row=row, column=1, sticky=NSEW)
+        self.lbl_is_running.grid(row=row, column=1, sticky=NW)
         self.lbl_is_running.configure(width=20, height=20)
         self.lbl_is_running.bind('<ButtonRelease-1>', lambda e: self.change_stalker_state())
         # self.btn_change_stalker_state = tk.Button(self, command=self.change_stalker_state)
         # self.btn_change_stalker_state.grid(row=row, column=1, sticky=W)
+
+        row += 1
+        tk.Label(self, text="Running since").grid(row=row, column=0, sticky=W)
+        self.lbl_running_since = tk.Label(self)
+        self.lbl_running_since.grid(row=row, column=1, sticky=W)
 
         self.after(200, self.update_info)
 
@@ -56,9 +64,15 @@ class StalkerProcess(tk.LabelFrame):
                 try:
                     pid = int(file.read())
                     self.stalker_process = psutil.Process(pid)
+                    self.lbl_running_since.configure(
+                        text=datetime.fromtimestamp(
+                            self.stalker_process.create_time()
+                        ).isoformat(sep=" ", timespec='seconds')
+                    )
                     return
                 except (ValueError, psutil.NoSuchProcess):  # failed to load pid or outdated pid
                     pass
+        self.lbl_running_since.configure(text="⎯⎯⎯⎯⎯")
         self.stalker_process = None
 
     def update_info(self):
@@ -95,6 +109,39 @@ class StalkerProcess(tk.LabelFrame):
 
 
 class ConfigProcess(tk.LabelFrame):
+    time_modes = [
+        'seconds',
+        'minutes'
+    ]
+    time_intervalls = [1, 2, 5, 10, 15, 20, 30]
+
     def __init__(self, master):
         super().__init__(master, text="Configure")
-        tk.Label(self, text="...").grid()
+
+        self.configuration = self.load_config()
+
+        row = 0
+
+        tk.Label(self, text="Measurement every ").grid(row=row)
+        time_interval = self.configuration.get('time-interval')
+        self.interval = tk.IntVar(
+            self,
+            value=time_interval if time_interval in self.time_intervalls else self.time_intervalls[3]
+        )
+        menu = tk.OptionMenu(self, self.interval, *self.time_intervalls)
+        menu.configure(relief=FLAT)
+        menu.grid(row=row, column=1, sticky=EW)
+
+        time_mode = self.configuration.get('time-mode')
+        self.units = tk.StringVar(
+            self,
+            value=time_mode if time_mode in self.time_modes else self.time_modes[0]
+        )
+        menu = tk.OptionMenu(self, self.units, *self.time_modes)
+        menu.configure(relief=FLAT)
+        menu.grid(row=row, column=2, sticky=EW)
+
+    @staticmethod
+    def load_config() -> dict:
+        with open(os.path.join(scripts.get_memdir(), 'config.json')) as file:
+            return json.load(file)
