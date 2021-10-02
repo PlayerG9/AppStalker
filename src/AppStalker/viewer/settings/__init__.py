@@ -107,6 +107,11 @@ class StalkerProcess(tk.LabelFrame):
             ) is True:
                 os.startfile(self.stalker_exe)
 
+    def restart(self):
+        if self.stalker_process:
+            self.stalker_process.kill()
+        os.startfile(self.stalker_exe)
+
 
 class ConfigProcess(tk.LabelFrame):
     time_modes = [
