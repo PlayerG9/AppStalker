@@ -107,10 +107,11 @@ class StalkerProcess(tk.LabelFrame):
             ) is True:
                 os.startfile(self.stalker_exe)
 
-    def restart(self):
+    def restart(self, force):
         if self.stalker_process:
             self.stalker_process.kill()
-        os.startfile(self.stalker_exe)
+        if self.stalker_process or force:
+            os.startfile(self.stalker_exe)
 
 
 class ConfigProcess(tk.LabelFrame):
@@ -122,8 +123,11 @@ class ConfigProcess(tk.LabelFrame):
 
     def __init__(self, master):
         super().__init__(master, text="Configure")
+        self.grid_columnconfigure(5, weight=1)
 
         self.configuration = self.load_config()
+
+        self.stalker_exe = self.master.stalkerprocess.stalker_exe
 
         row = 0
 
@@ -146,7 +150,43 @@ class ConfigProcess(tk.LabelFrame):
         menu.configure(relief=FLAT)
         menu.grid(row=row, column=2, sticky=EW)
 
+        row += 1
+        autostart_options = ['Disabled', 'User', 'All']
+        if autostart.is_added(autostart.KEY_ALL):
+            autostart_current = 2
+        elif autostart.is_added(autostart.KEY_USER):
+            autostart_current = 1
+        else:
+            autostart_current = 0
+        self.auto_start = tk.StringVar(
+            self,
+            autostart_options[autostart_current]
+        )
+        self.autostart_current = self.auto_start.get()
+        tk.Label(self, text="Autostart").grid(row=row, column=0, sticky=W)
+        menu = tk.OptionMenu(self, self.auto_start, *autostart_options)
+        menu.grid(row=row, column=1, sticky=EW)
+        if autostart_current == 2 and autostart.is_admin():
+            menu.configure(state=DISABLED)
+        elif not autostart.is_admin():
+            menu['menu'].entryconfigure(2, state=DISABLED)
+
+        row += 1
+        tk.Button(self, text="Apply", width=7, command=self.apply).grid(row=row, column=0, columnspan=6, sticky=E)
+
     @staticmethod
     def load_config() -> dict:
         with open(os.path.join(scripts.get_memdir(), 'config.json')) as file:
             return json.load(file)
+
+    def apply(self):
+        self.configuration['time-interval'] = self.interval.get()
+        self.configuration['time-mode'] = self.units.get()
+        auto_start = self.auto_start.get()
+        if self.autostart_current != auto_start:
+            autostart.remove_all()
+            if auto_start == 'User':
+                autostart.add(self.stalker_exe, autostart.KEY_USER)
+            elif autostart == 'All':
+                autostart.add(self.stalker_exe, autostart.KEY_ALL)
+        self.master.stalkerprocess.restart(force=False)
