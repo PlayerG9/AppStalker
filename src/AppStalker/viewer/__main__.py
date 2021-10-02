@@ -26,14 +26,22 @@ class Application(tk.Tk):
         self.menu.add_command(label='⚙', command=self.event_settings)
         self.menu.add_command(label='Ⓘ', command=self.event_about)
 
+        self.view = None
+        self.settings = None
+        self.frame = None
+
     def report_callback_exception(self, exc, val, tb):
         super().report_callback_exception(exc, val, tb)
 
     def event_view(self):
-        pass
+        if self.frame is self.view:
+            return
+        self.frame = self.view
 
     def event_settings(self):
-        pass
+        if self.frame is self.settings:
+            return
+        self.frame = self.settings
 
     def event_about(self):
         about.About(self)
