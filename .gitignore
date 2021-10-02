@@ -2,6 +2,7 @@
 .idea/
 temp/
 build/build/
+build/dist/
 src/AppStalker/logs/*
 src/AppStalker/memory/data.sl3
 
@@ -15,7 +16,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+# build/
 develop-eggs/
 dist/
 downloads/
