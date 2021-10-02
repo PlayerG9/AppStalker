@@ -136,6 +136,15 @@ class DataBase:
         )
         exe_id = cursor.fetchone()
 
+        def get(attr: str, form: callable = None):
+            try:
+                val = getattr(process, attr)()
+                if form:
+                    val = form(val)
+            except Exception:
+                return None
+            return val
+
         if exe_id:  # exe_id = (exe_id,)
             exe_id = exe_id[0]
         else:
@@ -143,11 +152,11 @@ class DataBase:
                            "(name, exe, cmdline, create_time, username) "
                            "VALUES (?, ?, ?, ?, ?)",
                            [
-                               process.name(),
-                               process.exe(),
-                               shlex.join(process.cmdline()),
-                               process.create_time(),
-                               process.username()
+                               get('name'),
+                               get('exe'),
+                               get('cmdline', shlex.join),
+                               get('create_time'),
+                               get('username')
                            ]
                            )
             exe_id = cursor.lastrowid
