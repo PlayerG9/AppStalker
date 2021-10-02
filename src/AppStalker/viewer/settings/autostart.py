@@ -71,6 +71,17 @@ def is_added(hkey=None, valcheck: str = None):
         return False
 
 
+def remove_all():
+    try:
+        remove(KEY_USER)
+    except OSError:
+        pass
+    try:
+        remove(KEY_ALL)
+    except OSError:
+        pass
+
+
 def add(path: str, hkey=None):
     hkey = _get_hkey(hkey)
 
@@ -84,7 +95,11 @@ def add(path: str, hkey=None):
 def remove(hkey=None):
     hkey = _get_hkey(hkey)
 
-    winreg.DeleteKey(hkey, KEY_PATH)
+    key = winreg.OpenKey(hkey, KEY_PATH, 0, winreg.KEY_WRITE)
+
+    winreg.DeleteValue(key, VALUE_NAME)
+
+    winreg.CloseKey(key)
 
 
 def _get_hkey(hkey):
