@@ -61,8 +61,6 @@ class Application:
         self.running = None
 
     def run(self):
-        if '--no-notify' not in sys.argv:
-            self.icon.notify("stalker is now running")
         logging.info("start running")
         self.running = True
         self.schedule_thread.start()
@@ -77,6 +75,11 @@ class Application:
                 self.warn_error(exception)
                 raise exception
             time.sleep(0.5)
+
+    def setup(self, icon: IconHint):
+        icon.visible = True
+        # if '--no-notify' not in sys.argv:
+        #     schedule.every(5).seconds.do(lambda: (self.icon.notify("stalker is now running"), schedule.CancelJob)[1])
 
     def quit(self):
         logging.info("Stop app")
