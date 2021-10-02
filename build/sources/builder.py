@@ -15,7 +15,7 @@ projectdir = join(appdir, 'src', 'AppStalker')
 PYINSTALLER = join(appdir, '_venv', 'Scripts', 'pyinstaller.exe')
 
 
-skip_compile = True
+skip_compile = False
 
 
 CMD = [
