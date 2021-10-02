@@ -46,6 +46,10 @@ class Application:
             title="AppStalker",
             menu=Menu(
                 MenuItem(
+                    text="View",
+                    action=self.start_viewer
+                ),
+                MenuItem(
                     text="Quit",
                     action=self.quit
                 )
@@ -115,6 +119,13 @@ class Application:
                 ''.join(exception.args)
             )
         )
+
+    def start_viewer(self):
+        try:
+            path = os.path.join(scripts.get_appdir(), 'Viewer.exe')
+            os.startfile(path)
+        except Exception as exception:
+            self.warn_error(exception)
 
 
 class DataBase:
