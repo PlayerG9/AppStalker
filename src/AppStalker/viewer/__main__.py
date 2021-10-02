@@ -10,6 +10,7 @@ import tkinter as tk
 import os
 
 import scripts
+import about
 
 
 class Application(tk.Tk):
@@ -35,7 +36,7 @@ class Application(tk.Tk):
         pass
 
     def event_about(self):
-        pass
+        about.About(self)
 
 
 def main():
