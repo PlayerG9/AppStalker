@@ -5,6 +5,7 @@ build/build/
 build/dist/
 src/AppStalker/logs/*
 src/AppStalker/memory/data.sl3
+src/AppStalker/memory/pid.share
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

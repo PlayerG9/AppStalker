@@ -20,9 +20,24 @@ import logging
 import sqlite3 as sql
 import json
 import shlex
+import atexit
 
 import scripts
 import processview
+
+
+def add_pidfile():
+    with open(pidfilepath, 'w') as file:
+        file.write(str(os.getpid()))
+    logging.info('pid-file added ({})'.format(os.getpid()))
+
+
+def remove_pidfile():
+    os.remove(pidfilepath)
+    logging.info("pid-file removed")
+
+
+pidfilepath = os.path.join(scripts.get_memdir(), 'pid.share')
 
 
 class Application:
@@ -211,6 +226,10 @@ def configure_logging():
 
 def main():
     configure_logging()
+
+    add_pidfile()
+    atexit.register(remove_pidfile)
+
     app = Application()
     try:
         app.run()
