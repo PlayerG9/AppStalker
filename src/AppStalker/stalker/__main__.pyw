@@ -14,6 +14,7 @@ import psutil
 
 import threading
 import os
+import sys
 import time
 import logging
 import sqlite3 as sql
@@ -60,6 +61,8 @@ class Application:
         self.running = None
 
     def run(self):
+        if '--no-notify' not in sys.argv:
+            self.icon.notify("stalker is now running")
         logging.info("start running")
         self.running = True
         self.schedule_thread.start()
