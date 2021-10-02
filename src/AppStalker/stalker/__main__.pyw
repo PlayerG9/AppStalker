@@ -14,7 +14,7 @@ import psutil
 
 import threading
 import os
-import sys
+# import sys
 import time
 import logging
 import sqlite3 as sql
