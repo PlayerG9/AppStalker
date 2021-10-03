@@ -2,6 +2,8 @@
 r"""
 
 """
+import sys
+
 from tendo.singleton import SingleInstance
 me = SingleInstance()
 
@@ -36,9 +38,11 @@ class Application(tk.Tk):
 
         self.view = dataview.DataView(self)
         self.settings = settings.Settings(self)
-        self.frame: tk.Widget = self.settings  # not view because then event_view() wouldn't do anything
-
-        self.event_view()
+        if '--settings' in sys.argv:
+            self.frame: tk.Widget = self.settings
+        else:
+            self.frame: tk.Widget = self.view
+        self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
     def report_callback_exception(self, exc, val, tb):
         super().report_callback_exception(exc, val, tb)
