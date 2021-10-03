@@ -120,6 +120,7 @@ class ConfigProcess(tk.LabelFrame):
         'minutes'
     ]
     time_intervalls = [1, 2, 5, 10, 15, 20, 30]
+    autostart_options = ['Disabled', 'User', 'All']
 
     def __init__(self, master):
         super().__init__(master, text="Configure")
@@ -151,22 +152,16 @@ class ConfigProcess(tk.LabelFrame):
         menu.grid(row=row, column=2, sticky=EW)
 
         row += 1
-        autostart_options = ['Disabled', 'User', 'All']
-        if autostart.is_added(autostart.KEY_ALL):
-            autostart_current = 2
-        elif autostart.is_added(autostart.KEY_USER):
-            autostart_current = 1
-        else:
-            autostart_current = 0
+        autostart_current = self.get_current_autostart()
         self.auto_start = tk.StringVar(
             self,
-            autostart_options[autostart_current]
+            autostart_current
         )
         self.autostart_current = self.auto_start.get()
         tk.Label(self, text="Autostart").grid(row=row, column=0, sticky=W)
-        menu = tk.OptionMenu(self, self.auto_start, *autostart_options)
+        menu = tk.OptionMenu(self, self.auto_start, *self.autostart_options)
         menu.grid(row=row, column=1, sticky=EW)
-        if autostart_current == 2 and autostart.is_admin():
+        if autostart_current == 'All' and autostart.is_admin():
             menu.configure(state=DISABLED)
         elif not autostart.is_admin():
             menu['menu'].entryconfigure(2, state=DISABLED)
@@ -189,4 +184,14 @@ class ConfigProcess(tk.LabelFrame):
                 autostart.add(self.stalker_exe, autostart.KEY_USER)
             elif autostart == 'All':
                 autostart.add(self.stalker_exe, autostart.KEY_ALL)
+            self.autostart_current = auto_start
         self.master.stalkerprocess.restart(force=False)
+
+    def get_current_autostart(self):
+        if autostart.is_added(autostart.KEY_ALL, valcheck=self.stalker_exe):
+            autostart_current = 2
+        elif autostart.is_added(autostart.KEY_USER, valcheck=self.stalker_exe):
+            autostart_current = 1
+        else:
+            autostart_current = 0
+        return self.autostart_options[autostart_current]
