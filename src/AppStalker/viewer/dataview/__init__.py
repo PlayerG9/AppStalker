@@ -12,6 +12,11 @@ class DataView(tk.LabelFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
+        self.loaded_from = None
+        self.loaded_to = None
+
+        self.scrollfactor = 0.0
+
         self.canvas = tk.Canvas(
             self,
         )
@@ -22,8 +27,6 @@ class DataView(tk.LabelFrame):
         self.xscroll = tk.Scrollbar(self, orient=HORIZONTAL, command=self.xview)
         self.xscroll.grid(row=1, column=0, sticky=EW)
         self.xscroll.bind('<ButtonRelease-1>', lambda e: self.undo_scroll())
-
-        self.scrollfactor = 0.0
 
         self.canvas.configure(xscrollcommand=self.xscrollcommand)
 

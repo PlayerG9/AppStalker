@@ -2,8 +2,6 @@
 r"""
 
 """
-import sys
-
 from tendo.singleton import SingleInstance
 me = SingleInstance()
 
@@ -11,6 +9,7 @@ import tkinter as tk
 import tkinter.messagebox
 
 import os
+import sys
 
 import scripts
 import about
