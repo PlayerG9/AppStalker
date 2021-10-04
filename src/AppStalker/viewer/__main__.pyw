@@ -12,9 +12,9 @@ import os
 import sys
 
 import scripts
-import about
-import settings
-import dataview
+from viewer import about
+from viewer import settings
+from viewer import dataview
 
 
 class Application(tk.Tk):

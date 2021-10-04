@@ -23,7 +23,7 @@ import shlex
 import atexit
 
 import scripts
-import processview
+from stalker import processview
 
 
 def add_pidfile():
@@ -91,7 +91,8 @@ class Application:
                 raise exception
             time.sleep(0.5)
 
-    def setup(self, icon: IconHint):
+    @staticmethod
+    def setup(icon: IconHint):
         icon.visible = True
         # if '--no-notify' not in sys.argv:
         #     schedule.every(5).seconds.do(lambda: (self.icon.notify("stalker is now running"), schedule.CancelJob)[1])
