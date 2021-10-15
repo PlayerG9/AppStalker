@@ -57,7 +57,7 @@ class DataView(tk.LabelFrame):
         import random
 
         def get_tone() -> int:
-            return random.randint(0, 127) + 127
+            return random.randint(0, 127)  # + 127
 
         def get_color() -> str:
             r, g, b = get_tone(), get_tone(), get_tone()
@@ -99,21 +99,42 @@ class DataView(tk.LabelFrame):
                 x = self.ts2x(ts)
                 points.append((exe_id, x))
 
-        if not points:
-            return
-
         if len(points) < 2:
+            self.canvas.create_text(
+                self.canvas.canvasx(self.winfo_width()//3),
+                self.canvas.canvasy(self.winfo_height()//2, 1),
+                text="Nothing here"
+            )
             return
 
-        def iter_points():
-            for exeId, cx in points:
-                yield cx  # x
-                y = self.canvas.canvasy(self.canvas.winfo_height() - 10 - exeId * 2)
-                yield y  # y
-                # yield self.canvas.canvasx(p[1], 1)  # x
-                # yield self.canvas.canvasy(y, 1)  # y
+        high = 1
+        last_exe_id = None
+        joints = []
 
-        self.canvas.create_line(*iter_points())
+        ay = self.canvas.winfo_height() - 20
+        by = ay - 20
+
+        for exe_id, x in points:
+            if exe_id is not last_exe_id:
+                high = not high
+                last_exe_id = exe_id
+
+                joints.append((x, ay if high else by))
+
+                if len(joints) >= 2:
+                    color = self.colormap[exe_id]
+                    self.canvas.create_line(
+                        *joints,
+                        fill=color,
+                        width=5,
+                        capstyle=BUTT,
+                        joinstyle=ROUND,
+                        smooth=False
+                    )
+
+                joints.clear()
+
+            joints.append((x, ay if high else by))
 
     def clear(self):
         self.canvas.delete(ALL)
