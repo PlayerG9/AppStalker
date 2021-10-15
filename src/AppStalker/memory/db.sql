@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.3.3 on Fr Okt 1 19:57:44 2021
+-- File generated with SQLiteStudio v3.3.3 on Fr Okt 15 15:33:10 2021
 --
 -- Text encoding used: UTF-8
 --
@@ -21,7 +21,7 @@ CREATE IF NOT EXISTS TABLE executables (
 CREATE IF NOT EXISTS TABLE measurements (
     exe_id INTEGER NOT NULL,
     ts     REAL    NOT NULL
-                   DEFAULT (CURRENT_TIMESTAMP) 
+                   DEFAULT (strftime('%s', 'now') ) 
 );
 
 
