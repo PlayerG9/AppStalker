@@ -33,6 +33,7 @@ class DataView(tk.LabelFrame):
         self.canvas.grid(row=0, column=0, sticky=NSEW)
         self.canvas.bind('<Button-2>', self.b2_down)
         self.canvas.bind('<B2-Motion>', self.b2_motion)
+        self.canvas.bind('<Configure>', lambda e: self.render())
 
         self.xscroll = tk.Scrollbar(self, orient=HORIZONTAL, command=self.xview)
         self.xscroll.grid(row=1, column=0, sticky=EW)
@@ -46,7 +47,7 @@ class DataView(tk.LabelFrame):
         self.debug_label = tk.Label(self, text='...')
         self.debug_label.grid(row=3, columnspan=2, sticky=EW)
 
-        self.render()
+        # self.render()
         # self.canvas.create_text(0, 0, text="Hello World")
         # self.canvas.create_rectangle(0, 0, 100, 100, fill='pink')
         # self.canvas.create_rectangle(200, 200, 400, 300, fill='pink')
@@ -105,9 +106,9 @@ class DataView(tk.LabelFrame):
             return
 
         def iter_points():
-            y = self.canvas.canvasy(self.canvas.winfo_height() - 50)
-            for p in points:
-                yield p[1]  # x
+            for exeId, cx in points:
+                yield cx  # x
+                y = self.canvas.canvasy(self.canvas.winfo_height() - 10 - exeId * 2)
                 yield y  # y
                 # yield self.canvas.canvasx(p[1], 1)  # x
                 # yield self.canvas.canvasy(y, 1)  # y
