@@ -19,7 +19,7 @@ class ExecutableDisplay(tk.Frame):
 
         self.widgets = {
             'name': tk.Message(self),
-            'exe': tk.Message(self),
+            'exe': tk.Message(self, bg='pink'),
             'cmdline': tk.Message(self),
             'create_time': tk.Message(self),
             'username': tk.Message(self)
@@ -27,10 +27,14 @@ class ExecutableDisplay(tk.Frame):
         for i, (key, widget) in enumerate(self.widgets.items()):
             label = key.replace('_', ' ').title()
             tk.Label(self, text=label).grid(row=i, column=0, sticky=W)
-            widget.configure(cursor='hand2', anchor=NW)
-            widget.bind('Configure>', lambda e: widget.configure(width=e.width))
+            widget.configure(cursor='hand2', anchor=NW, aspec=None)
+            widget.bind(
+                '<Configure>',
+                lambda e: e.widget.configure(width=e.widget.winfo_width())
+            )
             widget.bind('<Button>', self.copy)
             widget.grid(row=i, column=2, sticky=EW)
+
         ttk.Separator(self, orient=VERTICAL).grid(row=0, column=1, rowspan=len(self.widgets), sticky=NS)
         self.clear()
 
@@ -48,7 +52,7 @@ class ExecutableDisplay(tk.Frame):
             cursor.execute(query, [exe_id])
             item: sql.Row = cursor.fetchone()
 
-        for key, widget in self.widgets:
+        for key, widget in self.widgets.items():
             if key in item.keys():
                 value = item[key]
                 if isinstance(value, float):
