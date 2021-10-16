@@ -30,3 +30,10 @@ and mark `/src/AppStalker` as sources-root (add tp python path)
 `py /viewer`
 or
 `python3 /viewer`
+
+
+# todo
+
+- add option/interface to configure auto-delete time (currently ~6 months)
+- add command-line options to stalker to change logging-level (on auto-start)
+- add manuell VACUUM option
