@@ -4,8 +4,13 @@ import functools
 
 
 @functools.cache
+def is_executable() -> bool:
+    return getattr(sys, 'frozen', False)
+
+
+@functools.cache
 def get_appdir() -> str:
-    if getattr(sys, 'frozen', False):  # running as .exe
+    if is_executable():  # running as .exe
         return os.path.dirname(__file__)
     else:  # running a .py
         return os.path.dirname(__file__)
