@@ -10,66 +10,76 @@ import datetime
 import sqlite3 as sql
 
 import scripts
+from .executabledisplay import ExecutableDisplay
 
 
 class DataView(tk.LabelFrame):
-    colormap = {}
-
     def __init__(self, master):
-        if not self.colormap:
-            self.init_colormap()
-
         super().__init__(master, text="View")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
         self.ts = int(time.time())
+        self.colormap = {}
 
         self.scrollfactor = 0.0
+        self.ranges = []
+
+        self.display = ExecutableDisplay(self)
+        self.display.grid(row=0, columnspan=2, sticky=NSEW)
 
         self.canvas = tk.Canvas(
             self,
+            height=100,
+            background='white'
         )
-        self.canvas.grid(row=0, column=0, sticky=NSEW)
+        self.canvas.grid(row=1, column=0, sticky=NSEW)
         self.canvas.bind('<Button-2>', self.b2_down)
         self.canvas.bind('<B2-Motion>', self.b2_motion)
         self.canvas.bind('<Configure>', lambda e: self.render())
+        self.canvas.scan_mark(0, 0)
+        self.canvas.scan_dragto(300, 0, gain=1)
 
         self.xscroll = tk.Scrollbar(self, orient=HORIZONTAL, command=self.xview)
-        self.xscroll.grid(row=1, column=0, sticky=EW)
+        self.xscroll.grid(row=2, column=0, sticky=EW)
         self.xscroll.bind('<ButtonRelease-1>', lambda e: self.undo_scroll())
 
         self.canvas.configure(xscrollcommand=self.xscrollcommand)
 
         self.lbl = tk.Label(self, anchor=W, text="...")
-        self.lbl.grid(row=2, columnspan=2, sticky=EW)
+        self.lbl.grid(row=3, columnspan=2, sticky=EW)
         self.canvas.bind('<Motion>', self.evt_motion)
         self.debug_label = tk.Label(self, text='...')
-        self.debug_label.grid(row=3, columnspan=2, sticky=EW)
+        self.debug_label.grid(row=4, columnspan=2, sticky=EW)
 
         # self.render()
         # self.canvas.create_text(0, 0, text="Hello World")
         # self.canvas.create_rectangle(0, 0, 100, 100, fill='pink')
         # self.canvas.create_rectangle(200, 200, 400, 300, fill='pink')
 
-    @classmethod
-    def init_colormap(cls):
+    def get_color(self, exe_id: int):
         import random
 
         def get_tone() -> int:
-            return random.randint(0, 127)  # + 127
+            return random.randint(0, 127) + 127
 
         def get_color() -> str:
             r, g, b = get_tone(), get_tone(), get_tone()
             return '#{:02X}{:02X}{:02X}'.format(r, g, b)
 
-        with sql.connect(scripts.get_dbfile()) as conn:
-            cursor = conn.cursor()
+        try:
+            return self.colormap[exe_id]
+        except KeyError:
+            color = self.colormap[exe_id] = get_color()
+            return color
 
-            query = "SELECT rowid FROM executables"
-
-            for rowid, in cursor.execute(query).fetchall():
-                cls.colormap[rowid] = get_color()
+        # with sql.connect(scripts.get_dbfile()) as conn:
+        #     cursor = conn.cursor()
+        #
+        #     query = "SELECT rowid FROM executables"
+        #
+        #     for rowid, in cursor.execute(query).fetchall():
+        #         cls.colormap[rowid] = get_color()
 
     ####################################################################################################################
     # rendering
@@ -84,9 +94,6 @@ class DataView(tk.LabelFrame):
         from_ts = self.x2ts(from_x)
         to_ts = self.x2ts(to_x)
 
-        dt = datetime.datetime.fromtimestamp(from_ts)
-        self.lbl.configure(text=dt.isoformat(sep=' '))
-
         points = []
 
         with sql.connect(scripts.get_dbfile()) as conn:
@@ -99,42 +106,23 @@ class DataView(tk.LabelFrame):
                 x = self.ts2x(ts)
                 points.append((exe_id, x))
 
-        if len(points) < 2:
-            self.canvas.create_text(
-                self.canvas.canvasx(self.winfo_width()//3),
-                self.canvas.canvasy(self.winfo_height()//2, 1),
-                text="Nothing here"
-            )
-            return
+        ranges = self.ranges
+        ranges.clear()
 
-        high = 1
-        last_exe_id = None
-        joints = []
-
-        ay = self.canvas.winfo_height() - 20
-        by = ay - 20
+        last_id = None
+        start = None
 
         for exe_id, x in points:
-            if exe_id is not last_exe_id:
-                high = not high
-                last_exe_id = exe_id
+            if exe_id is not last_id:
+                last_id = exe_id
+                if start:
+                    ranges.append((start, x, exe_id))
+                start = x
 
-                joints.append((x, ay if high else by))
+        for from_x, to_x, exe_id in ranges:
+            self.canvas.create_rectangle(from_x, 30, to_x, 2000, fill=self.get_color(exe_id))
 
-                if len(joints) >= 2:
-                    color = self.colormap[exe_id]
-                    self.canvas.create_line(
-                        *joints,
-                        fill=color,
-                        width=5,
-                        capstyle=BUTT,
-                        joinstyle=ROUND,
-                        smooth=False
-                    )
-
-                joints.clear()
-
-            joints.append((x, ay if high else by))
+        self.after(1000, self.render)
 
     def clear(self):
         self.canvas.delete(ALL)
@@ -156,6 +144,13 @@ class DataView(tk.LabelFrame):
         dt = datetime.datetime.fromtimestamp(ts)
         self.lbl.configure(text=dt.isoformat(sep=' '))
         self.debug_label.configure(text='{}x{}'.format(x, y))
+
+        for from_x, to_x, exe_id in self.ranges:
+            if from_x <= x <= to_x:
+                self.display.display(exe_id)
+                break
+        else:
+            self.display.clear()
 
     ####################################################################################################################
     # canvas scrolling
@@ -189,7 +184,13 @@ class DataView(tk.LabelFrame):
         w2 = w//2
         self.canvas.scan_mark(w2, 0)
         self.canvas.scan_dragto(int(w2-w2*self.scrollfactor), 0, gain=1)
+
+        x = self.canvas.canvasx(w2)
+        ts =self.x2ts(x)
+        dt = datetime.datetime.fromtimestamp(ts)
+        self.lbl.configure(text=dt.isoformat(sep=' '))
         self.render()
+        # self.canvas.create_line(x, 0, x, self.canvas.winfo_height(), fill='black', width=2)
         # self.canvas.xview_scroll(int(self.scrollfactor*5), UNITS)  # no smooth scroll
 
     def xscrollcommand(self, *_):  # a: str ~= '0.0', b: str ~= '1.0'
