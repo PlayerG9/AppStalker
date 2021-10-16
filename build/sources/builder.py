@@ -30,11 +30,12 @@ CMD = [
     '--paths', join(projectdir, 'stalker'),
 
     '--runtime-hook', join(sourcedir, 'hooker.py'),
+    '--additional-hooks-dir', sourcedir,
 
     '--add-data', join(projectdir, 'memory') + os.pathsep + "memory",
 
-    '--windowed',
-    # '--icon', join(sourcedir, 'icon.ico'),  # exe is intended to start via autostart or Viewer and sus doesn't need an icon
+    '--noconsole',
+    '--icon', join(sourcedir, 'file.ico'),
 
     '--name', "Stalker",
 
@@ -58,6 +59,7 @@ CMD = [
     '--paths', join(projectdir, 'viewer'),
 
     '--runtime-hook', join(sourcedir, 'hooker.py'),
+    '--additional-hooks-dir', sourcedir,
 
     # already collected from stalker
     # '--add-data', join(projectdir, 'memory') + os.pathsep + "memory",
@@ -86,6 +88,8 @@ shutil.copytree('Stalker', 'AppStalker', dirs_exist_ok=True)
 shutil.copytree('Viewer', 'AppStalker', dirs_exist_ok=True)
 
 os.chdir('AppStalker')  # go into new programm-dir
+
+os.remove(join('memory', 'data.sl3'))  # remove database (should be freshly build on first start)
 
 os.mkdir('logs')  # create dir for logs
 os.mkdir('libs')  # create dir for .pyd files
