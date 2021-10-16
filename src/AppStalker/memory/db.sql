@@ -7,7 +7,7 @@ PRAGMA foreign_keys = off;
 BEGIN TRANSACTION;
 
 -- Table: executables
-CREATE IF NOT EXISTS TABLE executables (
+CREATE TABLE IF NOT EXISTS executables (
     name        STRING NOT NULL,
     exe         STRING NOT NULL,
     cmdline     STRING NOT NULL,
@@ -18,7 +18,7 @@ CREATE IF NOT EXISTS TABLE executables (
 
 
 -- Table: measurements
-CREATE IF NOT EXISTS TABLE measurements (
+CREATE TABLE IF NOT EXISTS measurements (
     exe_id INTEGER NOT NULL,
     ts     REAL    NOT NULL
                    DEFAULT (strftime('%s', 'now') ) 
