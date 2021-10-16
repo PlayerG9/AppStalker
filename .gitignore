@@ -3,6 +3,7 @@
 temp/
 build/build/
 build/dist/
+build/sources/setup.iss
 src/AppStalker/logs/*
 src/AppStalker/memory/data.sl3
 src/AppStalker/memory/pid.share
