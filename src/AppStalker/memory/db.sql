@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.3.3 on Fr Okt 15 15:33:10 2021
+-- File generated with SQLiteStudio v3.3.3 on Sa Okt 16 13:45:04 2021
 --
 -- Text encoding used: UTF-8
 --
@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS executables (
     exe         STRING NOT NULL,
     cmdline     STRING NOT NULL,
     create_time REAL   NOT NULL
-                       UNIQUE,
+                       UNIQUE
+                       PRIMARY KEY,
     username    STRING NOT NULL
 );
 
