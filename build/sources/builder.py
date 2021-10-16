@@ -67,7 +67,7 @@ CMD = [
     '--windowed',
     '--icon', join(sourcedir, 'icon.ico'),
 
-    '--name', "Viewer",
+    '--name', "StalkerViewer",
 
     join(projectdir, 'viewer', '__main__.pyw')
 ]
