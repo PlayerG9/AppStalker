@@ -102,8 +102,8 @@ class StalkerProcess(tk.LabelFrame):
                 self.stalker_process.kill()
         else:
             if messagebox.askokcancel(
-                "start stalker",
-                "Are you sure you want to start the stalker process"
+                    "start stalker",
+                    "Are you sure you want to start the stalker process"
             ) is True:
                 os.startfile(self.stalker_exe)
 

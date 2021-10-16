@@ -89,7 +89,7 @@ class DataView(tk.LabelFrame):
         self.clear()
 
         from_x = self.canvas.canvasx(-50)
-        to_x = self.canvas.canvasx(self.canvas.winfo_width()+50)
+        to_x = self.canvas.canvasx(self.canvas.winfo_width() + 50)
 
         from_ts = self.x2ts(from_x)
         to_ts = self.x2ts(to_x)
@@ -166,7 +166,7 @@ class DataView(tk.LabelFrame):
         if mode != 'moveto':
             return
         arg = float(arg)  # '0.0' <= arg <= '0.9'
-        self.adjust_scroll((arg+0.05)-0.5)
+        self.adjust_scroll((arg + 0.05) - 0.5)
 
     def adjust_scroll(self, val):
         if not self.scrollfactor:
@@ -181,12 +181,12 @@ class DataView(tk.LabelFrame):
             return
         self.after(25, self.update_scroll)
         w = self.canvas.winfo_width()
-        w2 = w//2
+        w2 = w // 2
         self.canvas.scan_mark(w2, 0)
-        self.canvas.scan_dragto(int(w2-w2*self.scrollfactor), 0, gain=1)
+        self.canvas.scan_dragto(int(w2 - w2 * self.scrollfactor), 0, gain=1)
 
         x = self.canvas.canvasx(w2)
-        ts =self.x2ts(x)
+        ts = self.x2ts(x)
         dt = datetime.datetime.fromtimestamp(ts)
         self.lbl.configure(text=dt.isoformat(sep=' '))
         self.render()

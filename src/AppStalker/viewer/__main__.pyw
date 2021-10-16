@@ -3,6 +3,7 @@ r"""
 
 """
 from tendo.singleton import SingleInstance
+
 me = SingleInstance()
 
 import tkinter as tk

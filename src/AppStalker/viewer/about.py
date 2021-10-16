@@ -46,8 +46,8 @@ class About(tk.Toplevel):
 this software is in beta
 no warranty
 if you destroy your entire computer or create a robot uprising. that's on you man.
-        """.strip(), width=width-x-5)
-        self.text.place(x=x, y=30, width=width-x, height=90)
+        """.strip(), width=width - x - 5)
+        self.text.place(x=x, y=30, width=width - x, height=90)
         self.copyright = tk.Label(self, bg=bg, text="Copyright © 2021 PlayerG9")
         self.copyright.place(x=x, y=105)
 
