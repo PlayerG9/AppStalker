@@ -89,7 +89,12 @@ shutil.copytree('Viewer', 'AppStalker', dirs_exist_ok=True)
 
 os.chdir('AppStalker')  # go into new programm-dir
 
-os.remove(join('memory', 'data.sl3'))  # remove database (should be freshly build on first start)
+dbfile = join('memory', 'data.sl3')
+os.remove(dbfile)  # remove database (should be freshly build on first start)
+import sqlite3 as sql
+sqlscript = open(os.path.join('memory', 'db.sql'), 'r', encoding='utf-8').read()
+with sql.connect(dbfile) as conn:
+    conn.executescript(sqlscript)
 
 os.mkdir('logs')  # create dir for logs
 os.mkdir('libs')  # create dir for .pyd files
