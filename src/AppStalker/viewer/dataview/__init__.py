@@ -50,7 +50,8 @@ class DataView(tk.LabelFrame):
         self.lbl.grid(row=3, columnspan=2, sticky=EW)
         self.canvas.bind('<Motion>', self.evt_motion)
         self.debug_label = tk.Label(self, text='...')
-        self.debug_label.grid(row=4, columnspan=2, sticky=EW)
+        if not scripts.is_executable():
+            self.debug_label.grid(row=4, columnspan=2, sticky=EW)
 
         # self.render()
         # self.canvas.create_text(0, 0, text="Hello World")
@@ -122,7 +123,7 @@ class DataView(tk.LabelFrame):
         for from_x, to_x, exe_id in ranges:
             self.canvas.create_rectangle(from_x, 30, to_x, 2000, fill=self.get_color(exe_id))
 
-        self.after(1000, self.render)
+        self.after(5000, self.render)
 
     def clear(self):
         self.canvas.delete(ALL)
