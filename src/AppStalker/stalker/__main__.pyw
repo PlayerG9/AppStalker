@@ -195,6 +195,7 @@ class Measurements:
             if not exe_id:
                 raise IndexError('how the fuck did this happen?')
             cursor.execute("INSERT INTO measurements (exe_id) VALUES (?)", [exe_id])
+            conn.commit()
 
 
 class DatabaseHandler:
@@ -214,12 +215,14 @@ class DatabaseHandler:
         with sql.connect(scripts.get_dbfile()) as conn:
             conn.execute(r"DELETE FROM executables WHERE create_time < ?", [ts])
             conn.execute(r"DELETE FROM measurements WHERE ts < ?;", [ts])
+            conn.commit()
 
     @classmethod
     def ensure_structure(cls):
         logging.debug("Ensure database-structure")
         with sql.connect(scripts.get_dbfile()) as conn:
             conn.executescript(cls.database_structure)
+            conn.commit()
 
 
 def configure_logging():
