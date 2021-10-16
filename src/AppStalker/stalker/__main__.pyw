@@ -50,9 +50,9 @@ class Application:
         if not isinstance(interval, int) or not (0 < interval <= 60):
             raise ValueError('invalid time-interval {!r}'.format(interval))
         if tm == 'minutes':
-            self.job = schedule.every(interval).minutes.at(':00').do(self.task)
+            self.job = schedule.every(interval).minutes.at(':00').do(self.task).tag('measurement')
         elif tm == 'seconds':
-            self.job = schedule.every(interval).seconds.do(self.task)
+            self.job = schedule.every(interval).seconds.do(self.task).tag('measurement')
         else:
             raise ValueError('invalid time-mode {!r}'.format(tm))
 
@@ -78,6 +78,7 @@ class Application:
     def run(self):
         logging.info("start running")
         self.running = True
+        DatabaseHandler.init()
         self.schedule_thread.start()
         self.icon.run()  # I would prefer if icon.run() is in a thread but then the systray-icon-menu won't show
         self.icon.visible = False
@@ -104,8 +105,8 @@ class Application:
 
     def task(self):
         process = processview.get_process()
-        database = DataBase(self.config)
-        database.add(process)
+        measurements = Measurements(self.config)
+        measurements.add(process)
 
     ####################################################################################################################
 
@@ -150,60 +151,72 @@ class Application:
             self.warn_error(exception)
 
 
-class DataBase:
+class Measurements:
+    def __init__(self, config: dict):
+        self.config = config  # currently not used
+
+    @staticmethod
+    def add(process: psutil.Process):
+        with sql.connect(scripts.get_dbfile()) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT rowid FROM executables WHERE create_time = ? LIMIT 1",
+                [process.create_time()]
+            )
+            exe_id = cursor.fetchone()
+
+            def get(attr: str, form: callable = None):
+                try:
+                    val = getattr(process, attr)()
+                    if form:
+                        val = form(val)
+                except Exception:
+                    return None
+                return val
+
+            if exe_id:  # exe_id = (exe_id,)
+                exe_id = exe_id[0]
+            else:
+                cursor.execute("INSERT INTO executables "
+                               "(name, exe, cmdline, create_time, username) "
+                               "VALUES (?, ?, ?, ?, ?)",
+                               [
+                                   get('name'),
+                                   get('exe'),
+                                   get('cmdline', shlex.join),
+                                   get('create_time'),
+                                   get('username')
+                               ]
+                               )
+                exe_id = cursor.lastrowid
+            if not exe_id:
+                raise IndexError('how the fuck did this happen?')
+            cursor.execute("INSERT INTO measurements (exe_id) VALUES (?)", [exe_id])
+
+
+class DatabaseHandler:
     database_structure = open(os.path.join(scripts.get_memdir(), 'db.sql'), 'r', encoding='utf-8').read()
 
-    def __init__(self, config: dict):
-        self.conn = sql.connect(os.path.join(scripts.get_memdir(), 'data.sl3'))
-        self.config = config
-        self.delete_oldest()
+    @classmethod
+    def init(cls):
+        logging.info("DatabaseHandler.init()")
+        cls.ensure_structure()
+        cls.delete_oldest()
+        schedule.every(10).minutes.do(cls.delete_oldest).tag('database-utility')
 
-    def __del__(self):
-        self.conn.close()
+    @staticmethod
+    def delete_oldest():
+        logging.debug("Delete oldest entrys")
+        ts = time.time() - 15552000  # ~6 months (6*30*24*60*60)
+        with sql.connect(scripts.get_dbfile()) as conn:
+            conn.execute(r"DELETE FROM executables WHERE create_time < ?", [ts])
+            conn.execute(r"DELETE FROM measurements WHERE ts < ?;", [ts])
 
-    def add(self, process: psutil.Process):
-        cursor = self.conn.cursor()
-        cursor.execute(
-            "SELECT rowid FROM executables WHERE create_time = ? LIMIT 1",
-            [process.create_time()]
-        )
-        exe_id = cursor.fetchone()
-
-        def get(attr: str, form: callable = None):
-            try:
-                val = getattr(process, attr)()
-                if form:
-                    val = form(val)
-            except Exception:
-                return None
-            return val
-
-        if exe_id:  # exe_id = (exe_id,)
-            exe_id = exe_id[0]
-        else:
-            cursor.execute("INSERT INTO executables "
-                           "(name, exe, cmdline, create_time, username) "
-                           "VALUES (?, ?, ?, ?, ?)",
-                           [
-                               get('name'),
-                               get('exe'),
-                               get('cmdline', shlex.join),
-                               get('create_time'),
-                               get('username')
-                           ]
-                           )
-            exe_id = cursor.lastrowid
-        if not exe_id:
-            raise IndexError('how the fuck did this happen?')
-        cursor.execute("INSERT INTO measurements (exe_id) VALUES (?)", [exe_id])
-        self.conn.commit()
-
-    def delete_oldest(self):
-        pass
-
-    def ensure_structure(self):
-        self.conn.execute(self.database_structure)
-        self.conn.commit()
+    @classmethod
+    def ensure_structure(cls):
+        logging.debug("Ensure database-structure")
+        with sql.connect(scripts.get_dbfile()) as conn:
+            conn.executescript(cls.database_structure)
 
 
 def configure_logging():
