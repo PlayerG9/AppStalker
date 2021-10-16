@@ -19,7 +19,7 @@ class ExecutableDisplay(tk.Frame):
 
         self.widgets = {
             'name': tk.Message(self),
-            'exe': tk.Message(self, bg='pink'),
+            'exe': tk.Message(self),
             'cmdline': tk.Message(self),
             'create_time': tk.Message(self),
             'username': tk.Message(self)
