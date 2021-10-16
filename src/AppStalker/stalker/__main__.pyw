@@ -133,6 +133,7 @@ class Application:
 
     def warn_error(self, exception: Exception):
         if not self.icon.HAS_NOTIFICATION: return
+        logging.error("Measurement failed", exc_info=exception)
         self.icon.notify(
             title="Measurement failed",
             message="Measurement failed due to an unexpected {}."
@@ -144,6 +145,7 @@ class Application:
         )
 
     def start_viewer(self):
+        logging.info("Start Viewer.exe")
         try:
             path = os.path.join(scripts.get_appdir(), 'Viewer.exe')
             os.startfile(path)
@@ -157,6 +159,7 @@ class Measurements:
 
     @staticmethod
     def add(process: psutil.Process):
+        logging.debug("Add process to database")
         with sql.connect(scripts.get_dbfile()) as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -170,7 +173,7 @@ class Measurements:
                     val = getattr(process, attr)()
                     if form:
                         val = form(val)
-                except Exception:
+                except (AttributeError, ValueError):
                     return None
                 return val
 
@@ -233,7 +236,7 @@ def configure_logging():
                 errors='namereplace'  # https://docs.python.org/3/library/functions.html#open => \N{...}
             )
         ],
-        level=logging.DEBUG
+        level=logging.INFO if scripts.is_executable() else logging.DEBUG
     )
     logging.getLogger('PIL').setLevel(logging.WARNING)
 
