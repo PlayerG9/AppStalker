@@ -2,9 +2,15 @@
 r"""
 
 """
-from tendo.singleton import SingleInstance
+from tendo.singleton import SingleInstance, SingleInstanceException
 
-me = SingleInstance()
+try:
+    me = SingleInstance()
+except SingleInstanceException:
+    import sys
+    import ctypes
+    ctypes.windll.user32.MessageBoxW(None, "This programm is already running", "Only one instance allowed", 16)
+    sys.exit(-1)
 
 import tkinter as tk
 import tkinter.messagebox
