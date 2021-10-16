@@ -2,9 +2,9 @@
 
 watch what programm you use and when
 
-✓ app-stalker (collect data)
-✓ configure app-stalker
-✓ enable and disable autostart of app-stalker
+✓ app-stalker (collect data)  
+✓ configure app-stalker  
+✓ enable and disable autostart of app-stalker  
 ✓ view used apps
 
 # warning!!!
