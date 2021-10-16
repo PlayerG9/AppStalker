@@ -22,6 +22,7 @@ class Application(tk.Tk):
         super().__init__()
 
         self.title("AppStalker")
+        self.geometry('{:.0f}x{:.0f}'.format(self.winfo_screenwidth() // 3, self.winfo_screenheight() // 3))
 
         iconpath = os.path.join(scripts.get_memdir(), 'icon.ico')
         if os.path.isfile(iconpath):
