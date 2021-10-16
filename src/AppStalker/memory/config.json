@@ -1,5 +1,4 @@
 {
   "time-interval": 15,
-  "time-mode": "seconds",
-  "auto_delete": ""
+  "time-mode": "seconds"
 }
