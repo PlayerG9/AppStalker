@@ -79,7 +79,7 @@ class Application(tk.Tk):
 
 
 def configure_logging():
-    filename = os.path.join(scripts.get_appdir(), 'logs', 'stalker.txt')
+    filename = os.path.join(scripts.get_appdir(), 'logs', 'viewer.txt')
     logging.basicConfig(
         format="{asctime} | {levelname:<10} | {filename:<15} | {lineno:<3} | {funcName:<15} | {message}",
         style="{",
