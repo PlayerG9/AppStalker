@@ -9,6 +9,7 @@ from tkinter import messagebox
 import os
 import json
 from datetime import datetime
+import sqlite3 as sql
 
 import psutil
 
@@ -192,4 +193,43 @@ class ConfigProcess(tk.LabelFrame):
 
 class DatabaseConfig(tk.LabelFrame):
     def __init__(self, master):
-        super().__init__(master, text="Configure")
+        super().__init__(master, text="Database")
+        self.button = tk.Button(self, text="Optimize", command=self.vacuum)
+        self.button.grid(row=0, columnspan=2, sticky=EW)
+        tk.Label(self, text="Filesize: ").grid(row=1, column=0, sticky=EW)
+        self.label = tk.Label(self, text="...")
+        self.label.grid(row=1, column=1, sticky=EW)
+        self.update_label()
+
+    def vacuum(self):
+        _text = self.button['text']
+        self.button.configure(cursor='wait', text="Database get's optimized")
+        try:
+            with sql.connect(scripts.get_dbfile()) as conn:
+                conn.execute('VACUUM')
+        finally:
+            self.button.configure(cursor='', text=_text)
+            self.update_label()
+
+    def update_label(self):
+        try:
+            size = os.path.getsize(scripts.get_dbfile())
+            self.label.configure(text=self.format_size(size))
+        except OSError:
+            self.label.configure(text="couln't get database size")
+
+    @staticmethod
+    def format_size(size: int) -> str:
+        FSIZES = (
+            ('GB', 1024 ** 3),
+            ('MB', 1024 ** 2),
+            ('KB', 1024 ** 1),
+            # ('B',  1024**0),
+        )
+
+        if size is None:
+            return '-B'
+        for st, sn in FSIZES:
+            if size > sn:
+                return '{:.2f}{}'.format(size / sn, st)
+        return '{:d}B'.format(size)
