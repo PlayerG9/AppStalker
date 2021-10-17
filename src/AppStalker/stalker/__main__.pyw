@@ -28,6 +28,7 @@ import sqlite3 as sql
 import json
 import shlex
 import atexit
+import argparse
 
 import scripts
 from stalker import processview
@@ -45,6 +46,17 @@ def remove_pidfile():
 
 
 pidfilepath = os.path.join(scripts.get_memdir(), 'pid.share')
+
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument(
+    '-l', '--loglevel',
+    type=str,
+    choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+    required=False,
+    help="log level for output"
+)
+arguments = argparser.parse_args()
 
 
 class Application:
