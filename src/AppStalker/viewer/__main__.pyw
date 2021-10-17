@@ -18,6 +18,7 @@ import tkinter.messagebox
 
 import os
 import sys
+import logging
 
 import scripts
 from viewer import about
@@ -77,7 +78,27 @@ class Application(tk.Tk):
         about.About(self)
 
 
+def configure_logging():
+    filename = os.path.join(scripts.get_appdir(), 'logs', 'stalker.txt')
+    logging.basicConfig(
+        format="{asctime} | {levelname:<10} | {filename:<15} | {lineno:<3} | {funcName:<15} | {message}",
+        style="{",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler(
+                filename=filename,
+                mode='w',
+                encoding='utf-8',
+                errors='namereplace'  # https://docs.python.org/3/library/functions.html#open => \N{...}
+            )
+        ],
+        level=logging.INFO if scripts.is_executable() else logging.DEBUG
+    )
+    # logging.getLogger('PIL').setLevel(logging.WARNING)
+
+
 def main():
+    configure_logging()
     app = Application()
     app.mainloop()
 
