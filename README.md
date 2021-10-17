@@ -36,3 +36,6 @@ or
 - add option/interface to configure auto-delete time (currently ~6 months)
 - add command-line options to stalker to change logging-level (on auto-start)
 - data-collection per user
+- change view-modes
+  - time-based (timeline) (current)
+  - day-based (apps and time/app)
