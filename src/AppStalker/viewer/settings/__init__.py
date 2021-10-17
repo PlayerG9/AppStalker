@@ -27,6 +27,8 @@ class Settings(tk.LabelFrame):
         self.stalkerprocess.grid(sticky=EW)
         self.configprocess = ConfigProcess(self)
         self.configprocess.grid(sticky=EW)
+        self.dbconfig = DatabaseConfig(self)
+        self.dbconfig.grid(sticky=EW)
 
     def on_place(self):
         pass
@@ -186,3 +188,8 @@ class ConfigProcess(tk.LabelFrame):
                 autostart.add(self.stalker_exe, autostart.KEY_ALL)
             self.autostart_current = auto_start
         self.master.stalkerprocess.restart(force=False)
+
+
+class DatabaseConfig(tk.LabelFrame):
+    def __init__(self, master):
+        super().__init__(master, text="Configure")
