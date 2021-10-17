@@ -13,6 +13,7 @@ import sqlite3 as sql
 
 import psutil
 import subprocess
+import shlex
 
 import scripts
 from . import autostart
@@ -183,11 +184,15 @@ class ConfigProcess(tk.LabelFrame):
         self.configuration['time-mode'] = self.units.get()
         auto_start = self.auto_start.get()
         if self.autostart_current != auto_start:
+            cmdline = shlex.join([
+                self.stalker_exe,
+                '--loglevel', 'WARNING'
+            ])
             autostart.remove_all()
             if auto_start == 'User':
-                autostart.add(self.stalker_exe, autostart.KEY_USER)
+                autostart.add(cmdline, autostart.KEY_USER)
             elif autostart == 'All':
-                autostart.add(self.stalker_exe, autostart.KEY_ALL)
+                autostart.add(cmdline, autostart.KEY_ALL)
             self.autostart_current = auto_start
         self.master.stalkerprocess.restart(force=False)
 
