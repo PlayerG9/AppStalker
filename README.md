@@ -36,3 +36,4 @@ or
 - add option/interface to configure auto-delete time (currently ~6 months)
 - add command-line options to stalker to change logging-level (on auto-start)
 - add manuell VACUUM option
+- data-collection per user
