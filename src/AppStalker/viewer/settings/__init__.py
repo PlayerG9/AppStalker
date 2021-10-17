@@ -12,6 +12,7 @@ from datetime import datetime
 import sqlite3 as sql
 
 import psutil
+import subprocess
 
 import scripts
 from . import autostart
@@ -108,13 +109,13 @@ class StalkerProcess(tk.LabelFrame):
                     "start stalker",
                     "Are you sure you want to start the stalker process"
             ) is True:
-                os.startfile(self.stalker_exe)
+                subprocess.Popen([self.stalker_exe, '--loglevel', 'WARNING'], shell=False)
 
     def restart(self, force):
         if self.stalker_process:
             self.stalker_process.kill()
         if self.stalker_process or force:
-            os.startfile(self.stalker_exe)
+            subprocess.Popen([self.stalker_exe, '--loglevel', 'WARNING'], shell=False)
 
 
 class ConfigProcess(tk.LabelFrame):
