@@ -39,7 +39,7 @@ class StalkerProcess(tk.LabelFrame):
     def __init__(self, master):
         super().__init__(master, text="Stalker")
 
-        self.stalker_process: psutil.Process = None
+        self.stalker_process: [psutil.Process, None] = None
 
         row = 0
 
@@ -152,7 +152,7 @@ class ConfigProcess(tk.LabelFrame):
         menu.grid(row=row, column=2, sticky=EW)
 
         row += 1
-        autostart_current = self.get_current_autostart()
+        autostart_current = self.autostart_options[autostart.get_autostart_level(self.stalker_exe)]
         self.auto_start = tk.StringVar(
             self,
             autostart_current
@@ -186,12 +186,3 @@ class ConfigProcess(tk.LabelFrame):
                 autostart.add(self.stalker_exe, autostart.KEY_ALL)
             self.autostart_current = auto_start
         self.master.stalkerprocess.restart(force=False)
-
-    def get_current_autostart(self):
-        if autostart.is_added(autostart.KEY_ALL, valcheck=self.stalker_exe):
-            autostart_current = 2
-        elif autostart.is_added(autostart.KEY_USER, valcheck=self.stalker_exe):
-            autostart_current = 1
-        else:
-            autostart_current = 0
-        return self.autostart_options[autostart_current]
