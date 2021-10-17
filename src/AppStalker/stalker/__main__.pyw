@@ -255,7 +255,7 @@ def configure_logging():
                 errors='namereplace'  # https://docs.python.org/3/library/functions.html#open => \N{...}
             )
         ],
-        level=logging.INFO if scripts.is_executable() else logging.DEBUG
+        level=arguments.loglevel or (logging.INFO if scripts.is_executable() else logging.DEBUG)
     )
     logging.getLogger('PIL').setLevel(logging.WARNING)
 
