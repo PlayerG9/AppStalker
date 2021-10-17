@@ -85,7 +85,7 @@ os.mkdir('AppStalker')
 
 # copy files from stalker and viewer (combine them to one programm)
 shutil.copytree('Stalker', 'AppStalker', dirs_exist_ok=True)
-shutil.copytree('Viewer', 'AppStalker', dirs_exist_ok=True)
+shutil.copytree('StalkerViewer', 'AppStalker', dirs_exist_ok=True)
 
 os.chdir('AppStalker')  # go into new programm-dir
 
