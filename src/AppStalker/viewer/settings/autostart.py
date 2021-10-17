@@ -48,7 +48,7 @@ def is_admin():
         raise SystemError("couln't check if user has admin provileges")
 
 
-KEY_ALL = winreg.HKEY_USERS  # or winreg.HKEY_CLASSES_ROOT?
+KEY_ALL = winreg.HKEY_CLASSES_ROOT
 KEY_USER = winreg.HKEY_CURRENT_USER
 KEY_PATH = r'Software\Microsoft\Windows\CurrentVersion\Run'
 VALUE_NAME = 'AppStalker'
@@ -71,6 +71,15 @@ def is_added(hkey=None, valcheck: str = None):
         return False
 
 
+def get_autostart_level(valcheck: str = None):
+    if is_added(KEY_ALL, valcheck=valcheck):
+        return 2
+    elif is_added(KEY_USER, valcheck=valcheck):
+        return 1
+    else:
+        return 0
+
+
 def remove_all():
     try:
         remove(KEY_USER)
@@ -87,9 +96,12 @@ def add(path: str, hkey=None):
 
     key = winreg.OpenKey(hkey, KEY_PATH, 0, winreg.KEY_WRITE)
 
-    winreg.SetValueEx(key, VALUE_NAME, 0, winreg.REG_SZ, path)  # maybe winreg.REG_BINARY
+    winreg.SetValueEx(key, VALUE_NAME, 0, winreg.REG_SZ, path)
 
     winreg.CloseKey(key)
+
+    if not is_added(hkey, valcheck=path):
+        raise OSError('failed to add')
 
 
 def remove(hkey=None):
