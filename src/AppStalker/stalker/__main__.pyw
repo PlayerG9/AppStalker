@@ -262,6 +262,7 @@ def configure_logging():
 
 def main():
     configure_logging()
+    logging.debug(json.dumps(arguments.__dict__, indent=2))
 
     add_pidfile()
     atexit.register(remove_pidfile)
