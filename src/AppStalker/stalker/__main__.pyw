@@ -3,9 +3,10 @@ r"""
 
 """
 from tendo.singleton import SingleInstance, SingleInstanceException
+import getpass
 
 try:
-    me = SingleInstance()
+    me = SingleInstance(flavor_id=getpass.getuser())
 except SingleInstanceException:
     import sys
     import ctypes
