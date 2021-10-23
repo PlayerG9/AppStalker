@@ -10,6 +10,7 @@ except SingleInstanceException:
     import sys
     import ctypes
 
+    # todo needs to get replaced by something platform independent
     ctypes.windll.user32.MessageBoxW(None, "This program is already running", "Only one instance allowed", 16)
     sys.exit(-1)
 
