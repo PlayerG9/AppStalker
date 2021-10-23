@@ -10,12 +10,12 @@ except SingleInstanceException:
     import sys
     import ctypes
 
-    ctypes.windll.user32.MessageBoxW(None, "This programm is already running", "Only one instance allowed", 16)
+    ctypes.windll.user32.MessageBoxW(None, "This program is already running", "Only one instance allowed", 16)
     sys.exit(-1)
 
 import schedule
 from pystray import Icon, Menu, MenuItem
-from pystray._win32 import Icon as IconHint
+from pystray._base import Icon as IconHint
 from PIL import Image
 import psutil
 
@@ -46,7 +46,6 @@ def remove_pidfile():
 
 
 pidfilepath = os.path.join(scripts.get_memdir(), 'pid.share')
-
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument(
