@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter.constants import *
 
 import os
+import logging
 
 from PIL import Image, ImageTk
 
@@ -33,6 +34,7 @@ class About(tk.Toplevel):
             image = image.resize([height, height])
         else:
             image = Image.new('RGBA', [height, height])
+            logging.warning('missing icon: {}'.format(iconpath))
 
         self.photoimage = ImageTk.PhotoImage(image)
         del image
@@ -51,6 +53,8 @@ if you destroy your entire computer or create a robot uprising. that's on you ma
         self.copyright = tk.Label(self, bg=bg, text="Copyright © 2021 PlayerG9")
         self.copyright.place(x=x, y=105)
 
+        logging.debug('focus_force() + grab_set()')
         self.focus_force()
         self.grab_set()
         self.wait_window()
+        logging.debug('{} gets destroyed'.format(self))

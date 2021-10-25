@@ -29,6 +29,7 @@ from viewer import dataview
 class Application(tk.Tk):
     def __init__(self):
         super().__init__()
+        logging.info("build app")
 
         self.title("AppStalker")
         self.geometry('{:.0f}x{:.0f}'.format(self.winfo_screenwidth() // 3, self.winfo_screenheight() // 3))
@@ -36,6 +37,8 @@ class Application(tk.Tk):
         iconpath = os.path.join(scripts.get_memdir(), 'icon.ico')
         if os.path.isfile(iconpath):
             self.iconbitmap(iconpath)
+        else:
+            logging.warning('missing icon: {}'.format(iconpath))
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -54,27 +57,33 @@ class Application(tk.Tk):
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
     def report_callback_exception(self, exc, val, tb):
-        super().report_callback_exception(exc, val, tb)
+        logging.error("an error occured", exc_info=exc)
+        # super().report_callback_exception(exc, val, tb)
         tk.messagebox.showerror(
             "an error occured",
             "{}: {}".format(val.__class__.__qualname__, val)
         )
 
     def event_view(self):
+        logging.debug("event_view")
         if self.frame is self.view:
             return
+        logging.info("Change to view")
         self.frame.grid_remove()
         self.frame = self.view
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
     def event_settings(self):
+        logging.debug("event_settings")
         if self.frame is self.settings:
             return
+        logging.info("Change to settings")
         self.frame.grid_remove()
         self.frame = self.settings
         self.frame.grid(row=0, column=0, sticky=tk.NSEW)
 
     def event_about(self):
+        logging.debug("event_about")
         about.About(self)
 
 
