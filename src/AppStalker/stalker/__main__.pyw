@@ -149,7 +149,7 @@ class Application:
             config = json.load(configfile)
         finally:
             configfile.close()
-        return config
+        return config.get('stalker', {})
 
     def warn_error(self, exception: Exception):
         if not self.icon.HAS_NOTIFICATION: return

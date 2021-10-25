@@ -1,4 +1,9 @@
 {
-  "time-interval": 15,
-  "time-mode": "seconds"
+  "stalker": {
+    "time-interval": 15,
+    "time-mode": "seconds"
+  },
+  "viewer": {
+
+  }
 }
