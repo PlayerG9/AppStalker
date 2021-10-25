@@ -89,6 +89,8 @@ class DataView(tk.LabelFrame):
     def render(self):
         self.clear()
 
+        self.draw_times()
+
         from_x = self.canvas.canvasx(-50)
         to_x = self.canvas.canvasx(self.canvas.winfo_width() + 50)
 
@@ -124,6 +126,36 @@ class DataView(tk.LabelFrame):
             self.canvas.create_rectangle(from_x, 30, to_x, 2000, fill=self.get_color(exe_id))
 
         self.after(5000, self.render)
+
+    def draw_times(self):
+        w = self.canvas.winfo_width()
+        
+        y = self.canvas.canvasy(2)
+
+        x = self.canvas.canvasx(w // 2)
+        dt = datetime.datetime.fromtimestamp(self.x2ts(x))
+        self.canvas.create_text(
+            x,
+            y,
+            text=dt.strftime('%Y-%m-%d'),  # todo customizable in settings
+            anchor=N
+        )
+        x = self.canvas.canvasx(0 + 5)
+        dt = datetime.datetime.fromtimestamp(self.x2ts(x))
+        self.canvas.create_text(
+            x,
+            y,
+            text=dt.strftime('%H:%M:%S'),  # todo customizable in settings
+            anchor=NW
+        )
+        x = self.canvas.canvasx(w - 5)
+        dt = datetime.datetime.fromtimestamp(self.x2ts(x))
+        self.canvas.create_text(
+            x,
+            y,
+            text=dt.strftime('%H:%M:%S'),  # todo customizable in settings
+            anchor=NE
+        )
 
     def clear(self):
         self.canvas.delete(ALL)
