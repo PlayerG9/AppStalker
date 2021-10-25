@@ -243,9 +243,9 @@ class DatabaseHandler:
 
 
 def configure_logging():
-    filename = os.path.join(scripts.get_appdir(), 'logs', 'stalker.txt')
+    filename = os.path.join(scripts.get_appdir(), 'logs', 'stalker.log')
     logging.basicConfig(
-        format="{asctime} | {levelname:<10} | {filename:<15} | {lineno:<3} | {funcName:<15} | {message}",
+        format="{asctime} | {levelname:3.3} | {filename:<15} | {lineno:<3} | {funcName:<15} | {message}",
         style="{",
         handlers=[
             logging.StreamHandler(),
