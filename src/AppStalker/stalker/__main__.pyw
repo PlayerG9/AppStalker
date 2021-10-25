@@ -63,7 +63,7 @@ arguments = argparser.parse_args()
 class Application:
     def __init__(self):
         logging.info("Creating app")
-        self.config = self.get_config()
+        self.config = scripts.get_config('stalker', {})
 
         tm = self.config['time-mode']
         interval = self.config['time-interval']
@@ -140,16 +140,6 @@ class Application:
             logging.warning("Failed to load icon")
             image = Image.new('RGBA', [30, 30], 'cyan')
         return image
-
-    @staticmethod
-    def get_config() -> dict:
-        configpath = os.path.join(scripts.get_memdir(), 'config.json')
-        configfile = open(configpath)
-        try:
-            config = json.load(configfile)
-        finally:
-            configfile.close()
-        return config.get('stalker', {})
 
     def warn_error(self, exception: Exception):
         if not self.icon.HAS_NOTIFICATION: return
