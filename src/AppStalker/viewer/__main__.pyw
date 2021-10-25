@@ -32,7 +32,10 @@ class Application(tk.Tk):
         logging.info("build app")
 
         self.title("AppStalker")
-        self.geometry('{:.0f}x{:.0f}'.format(self.winfo_screenwidth() // 3, self.winfo_screenheight() // 3))
+        sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
+        self.geometry('{:.0f}x{:.0f}'.format(sw // 3, sh // 3))
+        self.minsize(sw // 4, sh // 4)
+        self.maxsize(sw // 2, sh // 2)
 
         iconpath = os.path.join(scripts.get_memdir(), 'icon.ico')
         if os.path.isfile(iconpath):
