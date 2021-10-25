@@ -31,20 +31,11 @@ while True:
         time_list[-1] = [time.asctime(time.localtime(time.time())).split(" ")[3], process_name]
         save()
 """
-import ctypes
-import ctypes.wintypes
+import os
 import psutil
 
 
 def get_process() -> psutil.Process:
-    pid = get_pid()
+    pid = os.getpid()
     process = psutil.Process(pid=pid)
     return process
-
-
-def get_pid():
-    user32 = ctypes.windll.user32
-    hwnd = user32.GetForegroundWindow()
-    pid = ctypes.wintypes.DWORD()
-    user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
-    return pid.value
