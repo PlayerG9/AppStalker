@@ -94,7 +94,7 @@ def configure_logging():
         ],
         level=logging.INFO if scripts.is_executable() else logging.DEBUG
     )
-    # logging.getLogger('PIL').setLevel(logging.WARNING)
+    logging.getLogger('PIL').setLevel(logging.WARNING)
 
 
 def main():
