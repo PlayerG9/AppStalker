@@ -15,7 +15,7 @@ if you destroy your entire computer or create a robot uprising. that's on you ma
 
 # project install information
 
-Python-Version: 3.9.4
+Used python-version by source-developer: 3.9.4
 
 ## run
 
