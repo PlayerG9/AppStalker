@@ -91,6 +91,7 @@ class Application:
                 )
             )
         )
+        self.icon.visible = True
 
         self.schedule_thread = threading.Thread(target=self.schedule_handler, daemon=True)
         self.running = None
