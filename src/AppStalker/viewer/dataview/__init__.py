@@ -118,12 +118,15 @@ class DataView(tk.LabelFrame):
         for exe_id, x in points:
             if exe_id is not last_id:
                 last_id = exe_id
-                if start:
+                if start is not None:
                     ranges.append((start, x, exe_id))
                 start = x
 
-        for from_x, to_x, exe_id in ranges:
-            self.canvas.create_rectangle(from_x, 30, to_x, 2000, fill=self.get_color(exe_id))
+        if ranges:  # at least one process found
+            ranges.append((start, to_x, last_id))
+
+        for left_x, right_x, exe_id in ranges:
+            self.canvas.create_rectangle(left_x, 30, right_x, 2000, fill=self.get_color(exe_id))
 
         self.after(5000, self.render)
 
