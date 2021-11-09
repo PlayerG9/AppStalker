@@ -191,17 +191,16 @@ class Measurements:
             if exe_id:  # exe_id = (exe_id,)
                 exe_id = exe_id[0]
             else:
-                cursor.execute("INSERT INTO executables "
-                               "(name, exe, cmdline, create_time, username) "
-                               "VALUES (?, ?, ?, ?, ?)",
-                               [
-                                   get('name'),
-                                   get('exe'),
-                                   get('cmdline', shlex.join),
-                                   get('create_time'),
-                                   get('username')
-                               ]
-                               )
+                cursor.execute(
+                    "INSERT INTO executables (name, exe, cmdline, create_time, username) VALUES (?, ?, ?, ?, ?)",
+                    [
+                        get('name'),
+                        get('exe'),
+                        get('cmdline', shlex.join),
+                        get('create_time'),
+                        get('username')
+                    ]
+                )
                 exe_id = cursor.lastrowid
             if not exe_id:
                 raise IndexError('how the fuck did this happen?')
