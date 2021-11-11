@@ -117,7 +117,7 @@ class DataView(tk.LabelFrame):
         last_id = None
         start = None
 
-        for exe_id, x in points:
+        for exe_id, x in points:  # needs to get improved (end is cut)
             if exe_id is not last_id:
                 last_id = exe_id
                 if start is not None:
