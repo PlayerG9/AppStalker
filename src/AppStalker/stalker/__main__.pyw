@@ -170,7 +170,7 @@ class Measurements:
 
     @staticmethod
     def add(process: psutil.Process):
-        logging.debug("Add process to database")
+        logging.debug("Add process to database: {}".format(process.name()))
         with sql.connect(scripts.get_dbfile()) as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -215,7 +215,7 @@ class DatabaseHandler:
         logging.info("DatabaseHandler.init()")
         cls.ensure_structure()
         cls.delete_oldest()
-        schedule.every(10).minutes.do(cls.delete_oldest).tag('database-utility')
+        schedule.every(30).minutes.at(':00').do(cls.delete_oldest).tag('database-utility')
 
     @staticmethod
     def delete_oldest():
