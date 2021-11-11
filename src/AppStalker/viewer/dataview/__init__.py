@@ -2,6 +2,7 @@
 r"""
 
 """
+import logging
 import tkinter as tk
 from tkinter.constants import *
 
@@ -53,10 +54,7 @@ class DataView(tk.LabelFrame):
         if not scripts.is_executable():
             self.debug_label.grid(row=4, columnspan=2, sticky=EW)
 
-        # self.render()
-        # self.canvas.create_text(0, 0, text="Hello World")
-        # self.canvas.create_rectangle(0, 0, 100, 100, fill='pink')
-        # self.canvas.create_rectangle(200, 200, 400, 300, fill='pink')
+        self.render(autoupdate=True)
 
     def get_color(self, exe_id: int):
         import random
@@ -86,7 +84,11 @@ class DataView(tk.LabelFrame):
     # rendering
     ####################################################################################################################
 
-    def render(self):
+    def render(self, *, autoupdate: bool = False):
+        if autoupdate:
+            logging.debug('auto-update-rendering')
+            self.after(5000, lambda: self.render(autoupdate=True))
+
         self.clear()
 
         self.draw_times()
@@ -122,13 +124,8 @@ class DataView(tk.LabelFrame):
                     ranges.append((start, x, exe_id))
                 start = x
 
-        if ranges:  # at least one process found
-            ranges.append((start, to_x, last_id))
-
         for left_x, right_x, exe_id in ranges:
             self.canvas.create_rectangle(left_x, 30, right_x, 2000, fill=self.get_color(exe_id))
-
-        self.after(5000, self.render)
 
     def draw_times(self):
         w = self.canvas.winfo_width()
